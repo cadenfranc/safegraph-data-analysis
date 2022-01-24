@@ -4,43 +4,15 @@ import plotly.graph_objects as go
 
 st.title('Coding Challenge')
 
+@st.cache
 def initialize_data() -> pd.DataFrame:
-    device_type = pd.read_parquet('parquet/device_type.parquet')
-    poi = pd.read_parquet('parquet/poi.parquet')
-    popularity_by_hour = pd.read_parquet('parquet/popularity_by_hour.parquet')
-    related_same_day_brand = pd.read_parquet('parquet/related_same_day_brand.parquet')
-
-    poi = pd.merge(poi, device_type, on='placekey', how='left')
-    poi['location_name'] = poi['location_name'].apply(lambda name: name.lower())
-
-    popularity_by_hour = pd.merge(popularity_by_hour, poi[['placekey', 'location_name']], on='placekey', how='left')
-    related_same_day_brand = pd.merge(related_same_day_brand, poi[['placekey', 'location_name']], on='placekey', how='left')
-
-    poi_lds = poi[(poi['location_name'].isin([
-        'church of jesus christ of latter day saints',
-        'the church of jesus christ of latter day saints']))]
-
-    pbh_lds = popularity_by_hour[(popularity_by_hour['location_name'].isin([
-        'church of jesus christ of latter day saints',
-        'the church of jesus christ of latter day saints']))].groupby(by='hour').mean().reset_index()
-
-    pbh_other = popularity_by_hour[(~popularity_by_hour['location_name'].isin([
-        'church of jesus christ of latter day saints',
-        'the church of jesus christ of latter day saints']))].groupby(by='hour').mean().reset_index()
-
-    rsdb_lds = related_same_day_brand[(related_same_day_brand['location_name'].isin([
-        'church of jesus christ of latter day saints',
-        'the church of jesus christ of latter day saints']))]
-
-    rsdb_other = related_same_day_brand[~(related_same_day_brand['location_name'].isin([
-        'church of jesus christ of latter day saints',
-        'the church of jesus christ of latter day saints']))]
-
-    rsdb_lds_head = rsdb_lds.groupby(by='related_same_day_brand').sum().reset_index().sort_values(by='value', ascending=False).head(10)
-    rsdb_other_head = rsdb_other.groupby(by='related_same_day_brand').sum().reset_index().sort_values(by='value', ascending=False).head(10)
+    poi_lds = pd.read_csv('poi_lds.csv')
+    pbh_lds = pd.read_csv('pbh_lds.csv')
+    pbh_other = pd.read_csv('pbh_other.csv')
+    rsdb_lds_head = pd.read_csv('rsdb_lds_head.csv')
+    rsdb_other_head = pd.read_csv('rsdb_other_head.csv')
 
     return poi_lds, pbh_lds, pbh_other, rsdb_lds_head, rsdb_other_head
-
 
 def get_code(prompt : str) -> str:
 
@@ -206,4 +178,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
