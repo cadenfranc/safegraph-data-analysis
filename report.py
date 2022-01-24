@@ -4,7 +4,6 @@ import plotly.graph_objects as go
 
 st.title('Coding Challenge')
 
-@st.cache
 def initialize_data() -> pd.DataFrame:
     device_type = pd.read_parquet('parquet/device_type.parquet')
     poi = pd.read_parquet('parquet/poi.parquet')
